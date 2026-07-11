@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth');
 const bookingsRoutes = require('./routes/bookings');
 const dashboardRoutes = require('./routes/dashboard');
 const contentRoutes = require('./routes/content');
+const uploadRoutes = require('./routes/upload');
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use('/api/trips', tripsRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/content', contentRoutes);
+app.use('/api/upload', uploadRoutes);
 
 app.use(errorHandler);
 
