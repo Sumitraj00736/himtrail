@@ -87,6 +87,11 @@ const TripSchema = new mongoose.Schema(
     itinerary: { type: [ItineraryDaySchema], default: [] },
     departingSoon: { type: Boolean, default: false },
     statusBadge: { type: String, trim: true },
+    displaySections: {
+      type: [String],
+      enum: ['Featured', 'Best Seller', 'Trekking in Nepal', 'Luxury Travel', 'Departing Soon'],
+      default: [],
+    },
   },
   { timestamps: true }
 );

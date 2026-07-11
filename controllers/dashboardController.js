@@ -1,8 +1,5 @@
 const asyncHandler = require('express-async-handler');
 const Review = require('../models/Review');
-const DepartingSoon = require('../models/DepartingSoon');
-const BestSeller = require('../models/BestSeller');
-const FeaturedTrip = require('../models/FeaturedTrip');
 const Homepage = require('../models/Homepage');
 const Menu = require('../models/Menu');
 
@@ -61,21 +58,6 @@ module.exports = {
   listReviews: list(Review),
   updateReview: update(Review),
   deleteReview: remove(Review),
-
-  createDepartingSoon: create(DepartingSoon),
-  listDepartingSoon: list(DepartingSoon, { order: 1 }),
-  updateDepartingSoon: update(DepartingSoon),
-  deleteDepartingSoon: remove(DepartingSoon),
-
-  createBestSeller: create(BestSeller),
-  listBestSellers: list(BestSeller, { order: 1 }),
-  updateBestSeller: update(BestSeller),
-  deleteBestSeller: remove(BestSeller),
-
-  createFeaturedTrip: create(FeaturedTrip),
-  listFeaturedTrips: list(FeaturedTrip, { order: 1 }),
-  updateFeaturedTrip: update(FeaturedTrip),
-  deleteFeaturedTrip: remove(FeaturedTrip),
 
   getHomepage,
   upsertHomepage,

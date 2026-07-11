@@ -23,6 +23,15 @@ const getTripBySlug = asyncHandler(async (req, res) => {
   res.json({ data: trip });
 });
 
+const getTripById = asyncHandler(async (req, res) => {
+  const trip = await Trip.findById(req.params.id);
+  if (!trip) {
+    res.status(404);
+    throw new Error('Trip not found');
+  }
+  res.json({ data: trip });
+});
+
 const createTrip = asyncHandler(async (req, res) => {
   const trip = await Trip.create(req.body);
   res.status(201).json({ data: trip });
@@ -39,4 +48,13 @@ const updateTrip = asyncHandler(async (req, res) => {
   res.json({ data: trip });
 });
 
-module.exports = { listTrips, getTripBySlug, createTrip, updateTrip };
+const deleteTrip = asyncHandler(async (req, res) => {
+  const trip = await Trip.findByIdAndDelete(req.params.id);
+  if (!trip) {
+    res.status(404);
+    throw new Error('Trip not found');
+  }
+  res.json({ message: 'Deleted' });
+});
+
+module.exports = { listTrips, getTripBySlug, getTripById, createTrip, updateTrip, deleteTrip };
