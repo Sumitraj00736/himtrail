@@ -8,7 +8,8 @@
     "start": "node index.js",
     "seed:admin": "node scripts/seedAdmin.js",
     "seed:menus": "node scripts/seedMenus.js",
-    "seed:trips": "node scripts/seedTrips.js"
+    "seed:trips": "node scripts/seedTrips.js",
+    "seed:team": "node scripts/seedTeam.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

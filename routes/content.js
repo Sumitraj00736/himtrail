@@ -8,6 +8,8 @@ const {
   listMenus,
   listTrekkingInNepal,
   listLuxuryTravel,
+  listDestinations,
+  listTeamMembers,
 } = require('../controllers/contentController');
 
 const router = express.Router();
@@ -20,5 +22,7 @@ router.get('/homepage', getHomepage);
 router.get('/menus', listMenus);
 router.get('/trekking-in-nepal', listTrekkingInNepal);
 router.get('/luxury-travel', listLuxuryTravel);
+router.get('/destinations', listDestinations);
+router.get('/team', listTeamMembers);
 
 module.exports = router;

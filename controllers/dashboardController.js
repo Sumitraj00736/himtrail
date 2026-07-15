@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const Review = require('../models/Review');
 const Homepage = require('../models/Homepage');
 const Menu = require('../models/Menu');
+const TeamMember = require('../models/TeamMember');
 
 const create = (Model) =>
   asyncHandler(async (req, res) => {
@@ -66,4 +67,9 @@ module.exports = {
   listMenus: list(Menu, { order: 1 }),
   updateMenu: update(Menu),
   deleteMenu: remove(Menu),
+
+  createTeamMember: create(TeamMember),
+  listTeamMembersAdmin: list(TeamMember, { order: 1, createdAt: -1 }),
+  updateTeamMember: update(TeamMember),
+  deleteTeamMember: remove(TeamMember),
 };

@@ -42,17 +42,7 @@ const TripSchema = new mongoose.Schema(
     region: {
       type: String,
       required: true,
-      enum: [
-        'Everest',
-        'Annapurna',
-        'Langtang',
-        'Manaslu',
-        'Upper Mustang',
-        'Dolpo',
-        'Tibet',
-        'Bhutan',
-        'Tanzania',
-      ],
+      trim: true,
     },
     duration: { type: Number, required: true, min: 1 },
     price: { type: Number, required: true, min: 0 },
@@ -90,6 +80,13 @@ const TripSchema = new mongoose.Schema(
     displaySections: {
       type: [String],
       enum: ['Featured', 'Best Seller', 'Trekking in Nepal', 'Luxury Travel', 'Departing Soon'],
+      default: [],
+    },
+    // ── Destination feature ───────────────────────────────────
+    isDestination: { type: Boolean, default: false },
+    destinationSections: {
+      type: [String],
+      enum: ['Trek in Nepal', 'Luxury Travel'],
       default: [],
     },
   },
