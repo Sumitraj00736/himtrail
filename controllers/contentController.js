@@ -38,8 +38,60 @@ const getHomepage = asyncHandler(async (req, res) => {
   res.json({ data: doc });
 });
 
+/** Menus that auto-fill from Trip.displaySections (simple list menus only).
+ *  Do NOT include Trekking in Nepal — that mega-menu keeps curated region columns.
+ */
+const SECTION_MENU_MAP = [
+  { labelTest: /^luxury\s*travel$/i, section: 'Luxury Travel' },
+];
+
 const listMenus = asyncHandler(async (req, res) => {
   const docs = await Menu.find().sort({ order: 1 }).lean();
+
+  const sectionMenus = docs.filter((menu) =>
+    SECTION_MENU_MAP.some((m) => m.labelTest.test(menu.label || ''))
+  );
+  const sectionNames = [
+    ...new Set(
+      sectionMenus
+        .map((menu) => SECTION_MENU_MAP.find((m) => m.labelTest.test(menu.label || ''))?.section)
+        .filter(Boolean)
+    ),
+  ];
+
+  const sectionTrips = sectionNames.length
+    ? await Trip.find({ displaySections: { $in: sectionNames } })
+        .select('_id slug title displaySections')
+        .sort({ title: 1 })
+        .lean()
+    : [];
+
+  const tripsBySection = new Map();
+  sectionNames.forEach((name) => tripsBySection.set(name, []));
+  sectionTrips.forEach((trip) => {
+    (trip.displaySections || []).forEach((sec) => {
+      if (tripsBySection.has(sec)) tripsBySection.get(sec).push(trip);
+    });
+  });
+
+  /* Auto-fill Luxury Travel from trips tagged with that display section */
+  docs.forEach((menu) => {
+    const match = SECTION_MENU_MAP.find((m) => m.labelTest.test(menu.label || ''));
+    if (!match) return;
+    const tagged = tripsBySection.get(match.section) || [];
+    menu.columns = [
+      {
+        title: menu.columns?.[0]?.title || match.section,
+        items: tagged.map((trip) => ({
+          label: trip.title,
+          itemType: 'trip',
+          tripId: trip._id,
+          categoryId: null,
+          href: `/trips/${trip.slug}`,
+        })),
+      },
+    ];
+  });
 
   const tripIds = [];
   const categoryIds = [];
