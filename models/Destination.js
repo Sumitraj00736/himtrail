@@ -25,19 +25,12 @@ const DestinationSchema = new mongoose.Schema(
     destination: {
       type: String,
       required: true,
-      enum: ['Nepal', 'Tanzania', 'Bhutan', 'Tibet'],
+      trim: true,
     },
     category: {
       type: String,
       required: true,
-      enum: [
-        'Trekking',
-        'Heli Tour',
-        'Adventure',
-        'Climbing',
-        'Cultural',
-        'Wildlife',
-      ],
+      trim: true,
     },
     region: {
       type: String,

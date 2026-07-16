@@ -14,6 +14,19 @@ const {
   listTeamMembersAdmin,
   updateTeamMember,
   deleteTeamMember,
+  createDestination,
+  listDestinationsAdmin,
+  createDestinationCategory,
+  getDestinationCategoryById,
+  updateDestinationCategory,
+  deleteDestinationCategory,
+  updateDestination,
+  deleteDestination,
+  getDestinationById,
+  listTripOptionsAdmin,
+  createTripOption,
+  updateTripOption,
+  deleteTripOption,
 } = require('../controllers/dashboardController');
 const { protect } = require('../middleware/auth');
 const { staffOrAdmin } = require('../middleware/roles');
@@ -39,5 +52,16 @@ router.get('/team', listTeamMembersAdmin);
 router.post('/team', createTeamMember);
 router.put('/team/:id', updateTeamMember);
 router.delete('/team/:id', deleteTeamMember);
+
+router.get('/destinations', listDestinationsAdmin);
+router.post('/destinations', createDestinationCategory);
+router.get('/destinations/:id', getDestinationCategoryById);
+router.put('/destinations/:id', updateDestinationCategory);
+router.delete('/destinations/:id', deleteDestinationCategory);
+
+router.get('/trip-options', listTripOptionsAdmin);
+router.post('/trip-options', createTripOption);
+router.put('/trip-options/:id', updateTripOption);
+router.delete('/trip-options/:id', deleteTripOption);
 
 module.exports = router;
