@@ -3,6 +3,7 @@ const Review = require('../models/Review');
 const Homepage = require('../models/Homepage');
 const Menu = require('../models/Menu');
 const TeamMember = require('../models/TeamMember');
+const Destination = require('../models/Destination');
 
 const create = (Model) =>
   asyncHandler(async (req, res) => {
@@ -72,4 +73,17 @@ module.exports = {
   listTeamMembersAdmin: list(TeamMember, { order: 1, createdAt: -1 }),
   updateTeamMember: update(TeamMember),
   deleteTeamMember: remove(TeamMember),
+
+  createDestination: create(Destination),
+  listDestinationsAdmin: list(Destination, { createdAt: -1 }),
+  updateDestination: update(Destination),
+  deleteDestination: remove(Destination),
+  getDestinationById: asyncHandler(async (req, res) => {
+    const doc = await Destination.findById(req.params.id);
+    if (!doc) {
+      res.status(404);
+      throw new Error('Not found');
+    }
+    res.json({ data: doc });
+  }),
 };

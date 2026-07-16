@@ -4,6 +4,7 @@ const Homepage = require('../models/Homepage');
 const Menu = require('../models/Menu');
 const Trip = require('../models/Trip');
 const TeamMember = require('../models/TeamMember');
+const Destination = require('../models/Destination');
 
 const listReviews = asyncHandler(async (req, res) => {
   const docs = await Review.find().sort({ createdAt: -1 });
