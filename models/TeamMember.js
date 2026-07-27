@@ -21,6 +21,16 @@ const TeamMemberSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    phoneCountryCode: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    phoneNumber: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     socialLinks: {
       facebook: { type: String, default: '' },
       instagram: { type: String, default: '' },
