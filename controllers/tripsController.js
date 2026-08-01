@@ -2,13 +2,19 @@ const asyncHandler = require('express-async-handler');
 const Trip = require('../models/Trip');
 
 const listTrips = asyncHandler(async (req, res) => {
-  const { category, destination, duration, region } = req.query;
+  const { category, destination, duration, region, q } = req.query;
   const query = {};
 
   if (category) query.category = category;
   if (destination) query.destination = destination;
   if (region) query.region = region;
   if (duration) query.duration = { $lte: Number(duration) };
+  if (q?.trim()) {
+    const search = q.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    query.$or = ['title', 'destination', 'region', 'category'].map((field) => ({
+      [field]: { $regex: search, $options: 'i' },
+    }));
+  }
 
   const trips = await Trip.find(query).sort({ createdAt: -1 });
   res.json({ data: trips });

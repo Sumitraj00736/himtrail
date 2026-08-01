@@ -7,6 +7,7 @@ const HomepageSchema = new mongoose.Schema(
     heroCtaLabel: { type: String, required: true, trim: true },
     heroCtaUrl: { type: String, required: true, trim: true },
     heroImage: { type: String, required: true, trim: true },
+    heroImages: { type: [String], default: [] },
     aboutTitle: { type: String, required: true, trim: true },
     aboutBody: { type: String, required: true, trim: true },
     updatedBy: { type: String, trim: true },
