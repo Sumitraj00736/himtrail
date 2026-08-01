@@ -18,6 +18,14 @@ const SustainabilitySchema = new mongoose.Schema(
   { _id: false }
 );
 
+const FaqSchema = new mongoose.Schema(
+  {
+    question: { type: String, required: true, trim: true },
+    answer: { type: String, required: true, trim: true },
+  },
+  { _id: false }
+);
+
 const TripSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
@@ -62,12 +70,15 @@ const TripSchema = new mongoose.Schema(
       ],
       default: [],
     },
+    mapImage: { type: String, trim: true },
+    mapDescription: { type: String, trim: true },
     reviews: {
       rating: { type: Number, default: 0, min: 0, max: 5 },
       count: { type: Number, default: 0, min: 0 },
     },
     sustainability: SustainabilitySchema,
     itinerary: { type: [ItineraryDaySchema], default: [] },
+    faqs: { type: [FaqSchema], default: [] },
     departingSoon: { type: Boolean, default: false },
     statusBadge: { type: String, trim: true },
     displaySections: {

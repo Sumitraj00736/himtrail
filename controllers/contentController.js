@@ -14,7 +14,12 @@ const {
 } = require('../utils/resolveDestinationCategories');
 
 const listReviews = asyncHandler(async (req, res) => {
-  const docs = await Review.find().sort({ createdAt: -1 });
+  const { tripId } = req.query;
+  const filter = {};
+  if (tripId) {
+    filter.trip = tripId;
+  }
+  const docs = await Review.find(filter).sort({ createdAt: -1 });
   res.json({ data: docs });
 });
 

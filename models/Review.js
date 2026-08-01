@@ -8,6 +8,7 @@ const ReviewSchema = new mongoose.Schema(
     rating: { type: Number, required: true, min: 1, max: 5 },
     source: { type: String, trim: true },
     publishedDate: { type: String, trim: true },
+    trip: { type: mongoose.Schema.Types.ObjectId, ref: 'Trip', required: false },
   },
   { timestamps: true }
 );
