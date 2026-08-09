@@ -7,6 +7,8 @@ const TeamMember = require('../models/TeamMember');
 const Destination = require('../models/Destination');
 const DestinationCategory = require('../models/DestinationCategory');
 const TripOption = require('../models/TripOption');
+const TravelAdvice = require('../models/TravelAdvice');
+const AboutPage = require('../models/AboutPage');
 const { categoryHref } = require('../utils/destinationCategoryPaths');
 const { syncCategoryToMenu, removeCategoryFromMenu } = require('../utils/syncDestinationCategoryMenu');
 const { resolveDestinationCategoriesFromMenu } = require('../utils/resolveDestinationCategories');
@@ -61,24 +63,30 @@ const upsertHomepage = asyncHandler(async (req, res) => {
   res.json({ data: doc });
 });
 
-/** Resolve menu item links: categories → /destinations/{country}/{slug}, trips → /trips/{slug} */
+/** Resolve menu item links: categories → /destinations/{country}/{slug}, trips → /trips/{slug}, travelAdvice → /travel-advice/{slug}, aboutPage → /about-us/{slug} */
 const resolveMenuItemLinks = async (body) => {
   if (!body?.columns?.length) return body;
 
   const tripIds = [];
   const categoryIds = [];
+  const travelAdviceIds = [];
+  const aboutPageIds = [];
 
   body.columns.forEach((col) => {
     (col.items || []).forEach((item) => {
       if (item.categoryId || item.itemType === 'category') {
         if (item.categoryId) categoryIds.push(item.categoryId);
+      } else if (item.travelAdviceId || item.itemType === 'travelAdvice') {
+        if (item.travelAdviceId) travelAdviceIds.push(item.travelAdviceId);
+      } else if (item.aboutPageId || item.itemType === 'aboutPage') {
+        if (item.aboutPageId) aboutPageIds.push(item.aboutPageId);
       } else if (item.tripId) {
         tripIds.push(item.tripId);
       }
     });
   });
 
-  const [trips, categories] = await Promise.all([
+  const [trips, categories, travelAdvicePosts, aboutPages] = await Promise.all([
     tripIds.length
       ? Trip.find({ _id: { $in: tripIds } }).select('_id slug title').lean()
       : [],
@@ -87,10 +95,18 @@ const resolveMenuItemLinks = async (body) => {
           .select('_id slug title country')
           .lean()
       : [],
+    travelAdviceIds.length
+      ? TravelAdvice.find({ _id: { $in: travelAdviceIds } }).select('_id slug title').lean()
+      : [],
+    aboutPageIds.length
+      ? AboutPage.find({ _id: { $in: aboutPageIds } }).select('_id slug title').lean()
+      : [],
   ]);
 
   const tripsById = new Map(trips.map((t) => [String(t._id), t]));
   const catsById = new Map(categories.map((c) => [String(c._id), c]));
+  const adviceById = new Map(travelAdvicePosts.map((p) => [String(p._id), p]));
+  const aboutPagesById = new Map(aboutPages.map((p) => [String(p._id), p]));
 
   const columns = body.columns.map((col) => ({
     ...col,
@@ -107,13 +123,51 @@ const resolveMenuItemLinks = async (body) => {
           itemType: 'category',
           categoryId: cat._id,
           tripId: null,
+          travelAdviceId: null,
+          aboutPageId: null,
           href: categoryHref(cat),
+        };
+      }
+
+      if (item.travelAdviceId || item.itemType === 'travelAdvice') {
+        const post = adviceById.get(String(item.travelAdviceId));
+        if (!post) {
+          const err = new Error(`Travel advice post not found for menu item "${item.label || item.travelAdviceId}"`);
+          err.statusCode = 400;
+          throw err;
+        }
+        return {
+          label: item.label || post.title,
+          itemType: 'travelAdvice',
+          travelAdviceId: post._id,
+          tripId: null,
+          categoryId: null,
+          aboutPageId: null,
+          href: `/travel-advice/${post.slug}`,
+        };
+      }
+
+      if (item.aboutPageId || item.itemType === 'aboutPage') {
+        const page = aboutPagesById.get(String(item.aboutPageId));
+        if (!page) {
+          const err = new Error(`About page not found for menu item "${item.label || item.aboutPageId}"`);
+          err.statusCode = 400;
+          throw err;
+        }
+        return {
+          label: item.label || page.title,
+          itemType: 'aboutPage',
+          aboutPageId: page._id,
+          tripId: null,
+          categoryId: null,
+          travelAdviceId: null,
+          href: `/about-us/${page.slug}`,
         };
       }
 
       if (!item.tripId) {
         if (!item.href) {
-          const err = new Error('Each menu item needs a linked trip or category');
+          const err = new Error('Each menu item needs a linked trip, category, post, or page');
           err.statusCode = 400;
           throw err;
         }
@@ -123,6 +177,8 @@ const resolveMenuItemLinks = async (body) => {
           href: item.href,
           tripId: null,
           categoryId: null,
+          travelAdviceId: null,
+          aboutPageId: null,
         };
       }
 
@@ -138,6 +194,8 @@ const resolveMenuItemLinks = async (body) => {
         itemType: 'trip',
         tripId: trip._id,
         categoryId: null,
+        travelAdviceId: null,
+        aboutPageId: null,
         href: `/trips/${trip.slug}`,
       };
     }),
@@ -370,4 +428,80 @@ module.exports = {
   createTripOption,
   updateTripOption,
   deleteTripOption,
+
+  // Travel Advice
+  listTravelAdviceAdmin: asyncHandler(async (req, res) => {
+    const docs = await TravelAdvice.find().sort({ order: 1, createdAt: -1 });
+    res.json({ data: docs });
+  }),
+
+  createTravelAdvice: asyncHandler(async (req, res) => {
+    const doc = await TravelAdvice.create(req.body);
+    res.status(201).json({ data: doc });
+  }),
+
+  getTravelAdviceById: asyncHandler(async (req, res) => {
+    const doc = await TravelAdvice.findById(req.params.id);
+    if (!doc) {
+      res.status(404);
+      throw new Error('Travel advice post not found');
+    }
+    res.json({ data: doc });
+  }),
+
+  updateTravelAdvice: asyncHandler(async (req, res) => {
+    const doc = await TravelAdvice.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!doc) {
+      res.status(404);
+      throw new Error('Travel advice post not found');
+    }
+    res.json({ data: doc });
+  }),
+
+  deleteTravelAdvice: asyncHandler(async (req, res) => {
+    const doc = await TravelAdvice.findByIdAndDelete(req.params.id);
+    if (!doc) {
+      res.status(404);
+      throw new Error('Travel advice post not found');
+    }
+    res.json({ data: doc });
+  }),
+
+  // About Pages
+  listAboutPagesAdmin: asyncHandler(async (req, res) => {
+    const docs = await AboutPage.find().sort({ order: 1, createdAt: -1 });
+    res.json({ data: docs });
+  }),
+
+  createAboutPage: asyncHandler(async (req, res) => {
+    const doc = await AboutPage.create(req.body);
+    res.status(201).json({ data: doc });
+  }),
+
+  getAboutPageById: asyncHandler(async (req, res) => {
+    const doc = await AboutPage.findById(req.params.id);
+    if (!doc) {
+      res.status(404);
+      throw new Error('About page not found');
+    }
+    res.json({ data: doc });
+  }),
+
+  updateAboutPage: asyncHandler(async (req, res) => {
+    const doc = await AboutPage.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!doc) {
+      res.status(404);
+      throw new Error('About page not found');
+    }
+    res.json({ data: doc });
+  }),
+
+  deleteAboutPage: asyncHandler(async (req, res) => {
+    const doc = await AboutPage.findByIdAndDelete(req.params.id);
+    if (!doc) {
+      res.status(404);
+      throw new Error('About page not found');
+    }
+    res.json({ data: doc });
+  }),
 };

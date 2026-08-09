@@ -7,6 +7,8 @@ const TeamMember = require('../models/TeamMember');
 const Destination = require('../models/Destination');
 const DestinationCategory = require('../models/DestinationCategory');
 const TripOption = require('../models/TripOption');
+const TravelAdvice = require('../models/TravelAdvice');
+const AboutPage = require('../models/AboutPage');
 const { categoryHref } = require('../utils/destinationCategoryPaths');
 const {
   resolveDestinationCategoriesFromMenu,
@@ -220,6 +222,38 @@ const listTripOptions = asyncHandler(async (req, res) => {
   });
 });
 
+/** Public: list all published travel advice posts */
+const listTravelAdvice = asyncHandler(async (req, res) => {
+  const docs = await TravelAdvice.find({ status: 'published' }).sort({ order: 1, createdAt: -1 });
+  res.json({ data: docs });
+});
+
+/** Public: get a single published travel advice post by slug */
+const getTravelAdviceBySlug = asyncHandler(async (req, res) => {
+  const doc = await TravelAdvice.findOne({ slug: req.params.slug, status: 'published' });
+  if (!doc) {
+    res.status(404);
+    throw new Error('Travel advice post not found');
+  }
+  res.json({ data: doc });
+});
+
+/** Public: list all published about pages */
+const listAboutPages = asyncHandler(async (req, res) => {
+  const docs = await AboutPage.find({ status: 'published' }).sort({ order: 1, createdAt: -1 });
+  res.json({ data: docs });
+});
+
+/** Public: get a single published about page by slug */
+const getAboutPageBySlug = asyncHandler(async (req, res) => {
+  const doc = await AboutPage.findOne({ slug: req.params.slug, status: 'published' });
+  if (!doc) {
+    res.status(404);
+    throw new Error('About page not found');
+  }
+  res.json({ data: doc });
+});
+
 module.exports = {
   listReviews,
   listDepartingSoon,
@@ -234,4 +268,8 @@ module.exports = {
   getDestinationBySlug,
   listTeamMembers,
   listTripOptions,
+  listTravelAdvice,
+  getTravelAdviceBySlug,
+  listAboutPages,
+  getAboutPageBySlug,
 };

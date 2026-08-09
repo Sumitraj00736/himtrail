@@ -13,6 +13,10 @@ const {
   getDestinationBySlug,
   listTeamMembers,
   listTripOptions,
+  listTravelAdvice,
+  getTravelAdviceBySlug,
+  listAboutPages,
+  getAboutPageBySlug,
 } = require('../controllers/contentController');
 
 const router = express.Router();
@@ -30,5 +34,9 @@ router.get('/destinations/:country/:slug', getDestinationCategoryPage);
 router.get('/destinations/:slug', getDestinationBySlug);
 router.get('/team', listTeamMembers);
 router.get('/trip-options', listTripOptions);
+router.get('/travel-advice', listTravelAdvice);
+router.get('/travel-advice/:slug', getTravelAdviceBySlug);
+router.get('/about-pages', listAboutPages);
+router.get('/about-pages/:slug', getAboutPageBySlug);
 
 module.exports = router;
