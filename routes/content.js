@@ -17,6 +17,7 @@ const {
   getTravelAdviceBySlug,
   listAboutPages,
   getAboutPageBySlug,
+  getFooterSettings,
 } = require('../controllers/contentController');
 
 const router = express.Router();
@@ -38,5 +39,6 @@ router.get('/travel-advice', listTravelAdvice);
 router.get('/travel-advice/:slug', getTravelAdviceBySlug);
 router.get('/about-pages', listAboutPages);
 router.get('/about-pages/:slug', getAboutPageBySlug);
+router.get('/footer-settings', getFooterSettings);
 
 module.exports = router;

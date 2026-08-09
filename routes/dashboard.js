@@ -37,6 +37,8 @@ const {
   getAboutPageById,
   updateAboutPage,
   deleteAboutPage,
+  getFooterSettings,
+  upsertFooterSettings,
 } = require('../controllers/dashboardController');
 const { protect } = require('../middleware/auth');
 const { staffOrAdmin } = require('../middleware/roles');
@@ -85,5 +87,8 @@ router.post('/about-pages', createAboutPage);
 router.get('/about-pages/:id', getAboutPageById);
 router.put('/about-pages/:id', updateAboutPage);
 router.delete('/about-pages/:id', deleteAboutPage);
+
+router.get('/footer-settings', getFooterSettings);
+router.put('/footer-settings', upsertFooterSettings);
 
 module.exports = router;

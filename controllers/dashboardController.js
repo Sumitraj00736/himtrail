@@ -9,6 +9,7 @@ const DestinationCategory = require('../models/DestinationCategory');
 const TripOption = require('../models/TripOption');
 const TravelAdvice = require('../models/TravelAdvice');
 const AboutPage = require('../models/AboutPage');
+const FooterSettings = require('../models/FooterSettings');
 const { categoryHref } = require('../utils/destinationCategoryPaths');
 const { syncCategoryToMenu, removeCategoryFromMenu } = require('../utils/syncDestinationCategoryMenu');
 const { resolveDestinationCategoriesFromMenu } = require('../utils/resolveDestinationCategories');
@@ -501,6 +502,23 @@ module.exports = {
     if (!doc) {
       res.status(404);
       throw new Error('About page not found');
+    }
+    res.json({ data: doc });
+  }),
+
+  // ── Footer Settings (singleton) ──────────────────────────────────────────
+  getFooterSettings: asyncHandler(async (req, res) => {
+    const doc = await FooterSettings.findOne().sort({ updatedAt: -1 });
+    res.json({ data: doc });
+  }),
+
+  upsertFooterSettings: asyncHandler(async (req, res) => {
+    const existing = await FooterSettings.findOne().sort({ updatedAt: -1 });
+    let doc;
+    if (existing) {
+      doc = await FooterSettings.findByIdAndUpdate(existing._id, req.body, { new: true });
+    } else {
+      doc = await FooterSettings.create(req.body);
     }
     res.json({ data: doc });
   }),

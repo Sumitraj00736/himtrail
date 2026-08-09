@@ -9,6 +9,7 @@ const DestinationCategory = require('../models/DestinationCategory');
 const TripOption = require('../models/TripOption');
 const TravelAdvice = require('../models/TravelAdvice');
 const AboutPage = require('../models/AboutPage');
+const FooterSettings = require('../models/FooterSettings');
 const { categoryHref } = require('../utils/destinationCategoryPaths');
 const {
   resolveDestinationCategoriesFromMenu,
@@ -254,6 +255,11 @@ const getAboutPageBySlug = asyncHandler(async (req, res) => {
   res.json({ data: doc });
 });
 
+const getFooterSettings = asyncHandler(async (req, res) => {
+  const doc = await FooterSettings.findOne().sort({ updatedAt: -1 });
+  res.json({ data: doc });
+});
+
 module.exports = {
   listReviews,
   listDepartingSoon,
@@ -272,4 +278,5 @@ module.exports = {
   getTravelAdviceBySlug,
   listAboutPages,
   getAboutPageBySlug,
+  getFooterSettings,
 };
